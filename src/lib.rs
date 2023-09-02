@@ -12,7 +12,7 @@ All [windows](https://crates.io/crates/windows) handle types are defined to be m
 # use windows::Win32::Graphics::Gdi::{HGDIOBJ, HBITMAP, DeleteObject, SelectObject};
 # fn create_new_bitmap() -> Handle { Handle::default() }
 safe_handle!(pub Handle(HBITMAP as HGDIOBJ), DeleteObject);
-//                              ^^^^^^^^^^ it's the trick
+//                              ^^^^^^^^^^ that's the trick
 let mut bitmap = create_new_bitmap();
 
 # let hdc = windows::Win32::Graphics::Gdi::HDC::default();
