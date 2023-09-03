@@ -124,3 +124,12 @@ fn splitted_hash_test2() {
     let hash = hasher.finish().unwrap();
     assert_eq!(hash, ABC_MD5);
 }
+
+#[test]
+fn close_test() {
+    let mut alg_provider = AlgProvider::open(AlgProvider::MD5).unwrap();
+    assert!(alg_provider.is_valid());
+    
+    alg_provider.close();
+    assert!(!alg_provider.is_valid());
+}

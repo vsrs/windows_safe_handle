@@ -38,10 +38,7 @@ macro_rules! safe_handle {
 
         impl Drop for $type {
             fn drop(&mut self) {
-                if !self.0.is_invalid() {
-                    let $val = self.0;
-                    let _res = $deleter;
-                }
+                self.close();
             }
         }
 
@@ -59,6 +56,26 @@ macro_rules! safe_handle {
             #[inline(always)]
             pub unsafe fn as_mut(&mut self) -> &mut $inner {
                 &mut self.0
+            }
+
+            #[inline(always)]
+            pub fn is_valid(&self) -> bool {
+                !self.is_invalid()
+            }
+
+            #[inline(always)]
+            pub fn is_invalid(&self) -> bool {
+                self.0.is_invalid()
+            }
+
+            pub fn close(&mut self) -> bool {
+                if self.is_valid() {
+                    let $val = core::mem::take(&mut self.0);
+                    let _res = $deleter;
+                    true
+                } else {
+                    false
+                }
             }
         }
 

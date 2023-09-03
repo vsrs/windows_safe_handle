@@ -1,6 +1,6 @@
 Generate smart pointers for [windows](https://crates.io/crates/windows) raw handles with ergonomic APIs.
 
-This crate doesn't offer pre-defined smart pointers. Instead, it provides a single [`safe_handle!`] macro for generation:
+This crate doesn't offer pre-defined smart pointers. Instead, it provides a single `safe_handle!` macro for generation:
 
 ### Simple Smart Pointer, calling an unsafe Function on `Drop`
 ```rust

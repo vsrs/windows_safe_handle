@@ -1,11 +1,12 @@
 [package]
 name = "windows_safe_handle"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "Generate smart pointers for https://crates.io/crates/windows raw handles with ergonomic APIs."
 readme = "README.md"
 repository = "https://github.com/vsrs/windows_safe_handle"
 license = "MIT OR Apache-2.0"
+categories = ["Windows APIs"]
 
 [dependencies]
 windows = "0.48"
