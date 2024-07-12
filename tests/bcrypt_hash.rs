@@ -14,22 +14,30 @@ impl AlgProvider {
 
     pub fn open(id: PCWSTR) -> Result<Self> {
         let mut handle = Self::default();
-        unsafe {
+        let result = unsafe {
             BCryptOpenAlgorithmProvider(
                 handle.as_mut(),
                 id,
                 PCWSTR::null(),
                 BCRYPT_OPEN_ALGORITHM_PROVIDER_FLAGS::default(),
-            )?
+            )
         };
+
+        if result.is_err() {
+            return Err(result.into());
+        }
 
         Ok(handle)
     }
 
     pub fn create_hash(&self) -> Result<Hash> {
         let mut handle = Hash::default();
-        unsafe {
-            BCryptCreateHash(self, handle.as_mut(), None, None, 0)?;
+        let result = unsafe {
+            BCryptCreateHash(self.0, handle.as_mut(), None, None, 0)
+        };
+
+        if result.is_err() {
+            return Err(result.into());
         }
 
         Ok(handle)
@@ -40,26 +48,32 @@ safe_handle!(pub Hash(BCRYPT_HASH_HANDLE as BCRYPT_HANDLE), BCryptDestroyHash);
 
 impl Hash {
     pub fn hash_data(&mut self, bytes: &[u8]) -> Result<()> {
-        unsafe { BCryptHashData(self, bytes, 0) }
+        let result = unsafe { BCryptHashData(self.0, bytes, 0) };
+        result.ok()
     }
 
     pub fn hash_length(&self) -> Result<u32> {
-        unsafe {
-            let mut length = u32::default();
-            let ptr = &mut length as *mut _ as *mut u8;
-            let mut buffer =
-                std::slice::from_raw_parts_mut(ptr, std::mem::size_of::<u32>());
-            let mut dummy = 0_u32;
+        let mut length = u32::default();
+        let ptr = &mut length as *mut _ as *mut u8;
+        let mut buffer = unsafe {
+            std::slice::from_raw_parts_mut(ptr, std::mem::size_of::<u32>())
+        };
+        let mut dummy = 0_u32;
+        let result = unsafe {
             BCryptGetProperty(
                 self,
                 BCRYPT_HASH_LENGTH,
                 Some(&mut buffer),
                 &mut dummy,
                 0,
-            )?;
+            )
+        };
 
-            Ok(length)
+        if result.is_err() {
+            return Err(result.into());
         }
+
+        Ok(length)
     }
 
     pub fn finish(self) -> Result<Vec<u8>> {
@@ -80,8 +94,9 @@ impl Hash {
 
     /// # Safety
     /// hash_buffer length must exactly match the size of the hash or MAC value.
-    pub unsafe fn finish_into(mut self, hash_buffer: &mut [u8]) -> Result<()> {
-        unsafe { BCryptFinishHash(&mut self, hash_buffer, 0) }
+    pub unsafe fn finish_into(self, hash_buffer: &mut [u8]) -> Result<()> {
+        let result = unsafe { BCryptFinishHash(self.0, hash_buffer, 0) };
+        result.ok()
     }
 }
 
@@ -129,7 +144,7 @@ fn splitted_hash_test2() {
 fn close_test() {
     let mut alg_provider = AlgProvider::open(AlgProvider::MD5).unwrap();
     assert!(alg_provider.is_valid());
-    
+
     alg_provider.close();
     assert!(!alg_provider.is_valid());
 }

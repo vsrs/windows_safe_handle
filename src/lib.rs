@@ -79,15 +79,15 @@ macro_rules! safe_handle {
             }
         }
 
-        impl windows::core::IntoParam<$inner> for & $type {
-            fn into_param(self) -> windows::core::Param<$inner> {
-                windows::core::Param::Borrowed(windows::core::Type::abi(&self.0))
+        impl windows::core::Param<$inner> for & $type {
+            unsafe fn param(self) -> windows::core::ParamValue<$inner> {
+                windows::core::ParamValue::Borrowed(core::mem::transmute_copy(&self.0))
             }
         }
 
-        impl windows::core::IntoParam<$inner> for &mut $type {
-            fn into_param(self) -> windows::core::Param<$inner> {
-                windows::core::Param::Borrowed(windows::core::Type::abi(&self.0))
+        impl windows::core::Param<$inner> for &mut $type {
+            unsafe fn param(self) -> windows::core::ParamValue<$inner> {
+                windows::core::ParamValue::Borrowed(core::mem::transmute_copy(&self.0))
             }
         }
     };
@@ -99,15 +99,15 @@ macro_rules! safe_handle {
     ($vis:vis $type:ident($inner:ty as $into:ty), |$val:ident| $deleter: block) => {
         $crate::safe_handle!($vis $type($inner), |$val| $deleter);
 
-        impl windows::core::IntoParam<$into> for & $type {
-            fn into_param(self) -> windows::core::Param<$into> {
-                self.0.into_param()
+        impl windows::core::Param<$into> for & $type {
+            unsafe fn param(self) -> windows::core::ParamValue<$into> {
+                self.0.param()
             }
         }
         
-        impl windows::core::IntoParam<$into> for &mut $type {
-            fn into_param(self) -> windows::core::Param<$into> {
-                self.0.into_param()
+        impl windows::core::Param<$into> for &mut $type {
+            unsafe fn param(self) -> windows::core::ParamValue<$into> {
+                self.0.param()
             }
         }
     };
