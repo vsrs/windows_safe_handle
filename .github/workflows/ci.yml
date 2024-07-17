@@ -9,7 +9,7 @@ env:
 
 jobs:
   build_and_test:
-    name: Rust project - latest
+    name: windows_safe_handle - latest
     runs-on: windows-latest
     strategy:
       matrix:
