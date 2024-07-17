@@ -6,7 +6,7 @@ description = "Generate smart pointers for https://crates.io/crates/windows raw 
 readme = "README.md"
 repository = "https://github.com/vsrs/windows_safe_handle"
 license = "MIT OR Apache-2.0"
-categories = ["Windows APIs"]
+categories = ["os::windows-apis"]
 
 [dependencies]
 windows = "0.58"
