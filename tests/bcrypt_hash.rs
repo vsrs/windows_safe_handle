@@ -23,24 +23,15 @@ impl AlgProvider {
             )
         };
 
-        if result.is_err() {
-            return Err(result.into());
-        }
-
-        Ok(handle)
+        result.to_hresult().map(|| handle)
     }
 
     pub fn create_hash(&self) -> Result<Hash> {
         let mut handle = Hash::default();
-        let result = unsafe {
-            BCryptCreateHash(self.0, handle.as_mut(), None, None, 0)
-        };
+        let result =
+            unsafe { BCryptCreateHash(self.0, handle.as_mut(), None, None, 0) };
 
-        if result.is_err() {
-            return Err(result.into());
-        }
-
-        Ok(handle)
+        result.to_hresult().map(|| handle)
     }
 }
 
@@ -69,11 +60,7 @@ impl Hash {
             )
         };
 
-        if result.is_err() {
-            return Err(result.into());
-        }
-
-        Ok(length)
+        result.to_hresult().map(|| length)
     }
 
     pub fn finish(self) -> Result<Vec<u8>> {
